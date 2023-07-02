@@ -12,7 +12,6 @@ import androidx.camera.core.ImageCapture
 import androidx.camera.video.Recorder
 import androidx.camera.video.Recording
 import androidx.camera.video.VideoCapture
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -25,7 +24,6 @@ import android.util.Log
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.ImageProxy
-import androidx.camera.video.FallbackStrategy
 import androidx.camera.video.MediaStoreOutputOptions
 import androidx.camera.video.Quality
 import androidx.camera.video.QualitySelector
@@ -38,6 +36,8 @@ import java.util.Locale
 
 typealias LumaListener = (luma: Double) -> Unit
 
+enum class CameraMode { PHOTO, VIDEO }
+
 class MainActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityMainBinding
 
@@ -47,6 +47,8 @@ class MainActivity : AppCompatActivity() {
     private var recording: Recording? = null
 
     private lateinit var cameraExecutor: ExecutorService
+
+    private var cameraModeIndex = 0
 
     private val activityResultLauncher =
         registerForActivityResult(
@@ -74,16 +76,31 @@ class MainActivity : AppCompatActivity() {
 
         // Request camera permissions
         if (allPermissionsGranted()) {
+            // Sets the listener for the switch
+            viewBinding.chip.setOnClickListener { changeCameraMode() }
             startCamera()
         } else {
             requestPermissions()
         }
-
-        // Set up the listeners for take photo and video capture buttons
-        viewBinding.imageCaptureButton.setOnClickListener { takePhoto() }
-        viewBinding.videoCaptureButton.setOnClickListener { captureVideo() }
-
         cameraExecutor = Executors.newSingleThreadExecutor()
+    }
+
+    private fun changeCameraMode(){
+        cameraModeIndex = (cameraModeIndex + 1) % CameraMode.values().size
+        startCamera()
+    }
+
+    private fun checkCameraMode() {
+        // Set up the listeners for take photo and video capture buttons
+        when(CameraMode.values()[cameraModeIndex]){
+            CameraMode.VIDEO -> {
+                viewBinding.captureButton.setOnClickListener { captureVideo() }
+            }
+            CameraMode.PHOTO -> {
+                viewBinding.captureButton.setOnClickListener { takePhoto() }
+            }
+        }
+        viewBinding.chip.text = "${CameraMode.values()[cameraModeIndex]}"
     }
 
     private fun takePhoto() {
@@ -132,7 +149,7 @@ class MainActivity : AppCompatActivity() {
     private fun captureVideo() {
         val videoCapture = this.videoCapture ?: return
 
-        viewBinding.videoCaptureButton.isEnabled = false
+        viewBinding.captureButton.isEnabled = false
 
         val curRecording = recording
         if (curRecording != null) {
@@ -170,7 +187,7 @@ class MainActivity : AppCompatActivity() {
             .start(ContextCompat.getMainExecutor(this)) { recordEvent ->
                 when(recordEvent) {
                     is VideoRecordEvent.Start -> {
-                        viewBinding.videoCaptureButton.apply {
+                        viewBinding.captureButton.apply {
                             text = getString(R.string.stop_capture)
                             isEnabled = true
                         }
@@ -188,7 +205,7 @@ class MainActivity : AppCompatActivity() {
                             Log.e(TAG, "Video capture ends with error: " +
                                     "${recordEvent.error}")
                         }
-                        viewBinding.videoCaptureButton.apply {
+                        viewBinding.captureButton.apply {
                             text = getString(R.string.start_capture)
                             isEnabled = true
                         }
@@ -198,6 +215,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startCamera() {
+
+        // Checks if it's on Image Capture mode or Video Capture mode
+        checkCameraMode()
+
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
 
         cameraProviderFuture.addListener({
@@ -211,43 +232,47 @@ class MainActivity : AppCompatActivity() {
                     it.setSurfaceProvider(viewBinding.viewFinder.surfaceProvider)
                 }
 
-            // Start VideoCapture instance.
-            val recorder = Recorder.Builder()
-                .setQualitySelector(QualitySelector.from(Quality.HIGHEST))
-                .build()
-            videoCapture = VideoCapture.withOutput(recorder)
-
-            /**
-            // Start ImageCapture instance.
-            imageCapture = ImageCapture.Builder().build()
-
-            // Start ImageAnalyzer instance.
-            val imageAnalyzer = ImageAnalysis.Builder()
-                .build()
-                .also {
-                    it.setAnalyzer(cameraExecutor, LuminosityAnalyzer { luma ->
-                        Log.d(TAG, "Average luminosity: $luma")
-                    })
-                }
-             *
-             */
-
             // Select back camera as a default
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
             try {
                 // Unbind use cases before rebinding
                 cameraProvider.unbindAll()
+                when(CameraMode.values()[cameraModeIndex]) {
+                    CameraMode.PHOTO -> {
 
-                /**
-                // Bind use cases to camera
-                cameraProvider.bindToLifecycle(
-                    this, cameraSelector, preview, imageCapture, imageAnalyzer)
-                 *
-                 */
+                        // Edit name of the button.
+                        viewBinding.captureButton.text = getText(R.string.take_photo)
+                        // Start ImageCapture instance.
+                        imageCapture = ImageCapture.Builder().build()
 
-                // Bind use cases to camera
-                cameraProvider.bindToLifecycle(this, cameraSelector, preview, videoCapture)
+                        // Start ImageAnalyzer instance.
+                        val imageAnalyzer = ImageAnalysis.Builder()
+                            .build()
+                            .also {
+                                it.setAnalyzer(cameraExecutor, LuminosityAnalyzer { luma ->
+                                    Log.d(TAG, "Average luminosity: $luma")
+                                })
+                            }
+                        // Bind use cases to camera
+                        cameraProvider.bindToLifecycle(
+                            this, cameraSelector, preview, imageCapture, imageAnalyzer)
+                    }
+                    CameraMode.VIDEO -> {
+
+                        // Edit name of the button.
+                        viewBinding.captureButton.text = getText(R.string.start_capture)
+
+                        // Start VideoCapture instance.
+                        val recorder = Recorder.Builder()
+                            .setQualitySelector(QualitySelector.from(Quality.HIGHEST))
+                            .build()
+                        videoCapture = VideoCapture.withOutput(recorder)
+
+                        // Bind use cases to camera
+                        cameraProvider.bindToLifecycle(this, cameraSelector, preview, videoCapture)
+                    }
+                }
 
             } catch(exc: Exception) {
                 Log.e(TAG, "Use case binding failed", exc)
@@ -256,6 +281,7 @@ class MainActivity : AppCompatActivity() {
         }, ContextCompat.getMainExecutor(this))
 
     }
+
 
     private fun requestPermissions() {
         activityResultLauncher.launch(REQUIRED_PERMISSIONS)
