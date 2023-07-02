@@ -86,21 +86,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun changeCameraMode(){
+        // cameraModeIndex iterates mode
         cameraModeIndex = (cameraModeIndex + 1) % CameraMode.values().size
-        startCamera()
-    }
 
-    private fun checkCameraMode() {
-        // Set up the listeners for take photo and video capture buttons
-        when(CameraMode.values()[cameraModeIndex]){
-            CameraMode.VIDEO -> {
-                viewBinding.captureButton.setOnClickListener { captureVideo() }
-            }
-            CameraMode.PHOTO -> {
-                viewBinding.captureButton.setOnClickListener { takePhoto() }
-            }
-        }
-        viewBinding.chip.text = "${CameraMode.values()[cameraModeIndex]}"
+        startCamera()
     }
 
     private fun takePhoto() {
@@ -216,8 +205,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun startCamera() {
 
-        // Checks if it's on Image Capture mode or Video Capture mode
-        checkCameraMode()
+        // Sets text to the chip.
+        viewBinding.chip.text = "${CameraMode.values()[cameraModeIndex]} MODE"
 
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
 
@@ -241,6 +230,9 @@ class MainActivity : AppCompatActivity() {
                 when(CameraMode.values()[cameraModeIndex]) {
                     CameraMode.PHOTO -> {
 
+                        // Sets the listener for the button.
+                        viewBinding.captureButton.setOnClickListener { takePhoto() }
+
                         // Edit name of the button.
                         viewBinding.captureButton.text = getText(R.string.take_photo)
                         // Start ImageCapture instance.
@@ -260,6 +252,8 @@ class MainActivity : AppCompatActivity() {
                     }
                     CameraMode.VIDEO -> {
 
+                        // Sets the listener for the button.
+                        viewBinding.captureButton.setOnClickListener { captureVideo() }
                         // Edit name of the button.
                         viewBinding.captureButton.text = getText(R.string.start_capture)
 
