@@ -37,6 +37,7 @@ import java.util.Locale
 typealias LumaListener = (luma: Double) -> Unit
 
 enum class CameraMode { PHOTO, VIDEO }
+enum class MyCameraSelector { BACK, FRONT }
 
 class MainActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityMainBinding
@@ -48,7 +49,11 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var cameraExecutor: ExecutorService
 
-    private var cameraModeIndex = 0
+    // Selecto photo mode as default
+    private var cameraMode = CameraMode.PHOTO
+
+    // Select back camera as a default
+    private var myCameraSelector = MyCameraSelector.BACK
 
     private val activityResultLauncher =
         registerForActivityResult(
@@ -76,8 +81,12 @@ class MainActivity : AppCompatActivity() {
 
         // Request camera permissions
         if (allPermissionsGranted()) {
-            // Sets the listener for the switch
-            viewBinding.chip.setOnClickListener { changeCameraMode() }
+            // Sets the listener for the photo/video chip
+            viewBinding.chip.setOnClickListener { swapCameraMode() }
+
+            // Sets the listener for the back/front camera chip
+            viewBinding.chip2.setOnClickListener{ swapCameraSelector() }
+
             startCamera()
         } else {
             requestPermissions()
@@ -85,12 +94,31 @@ class MainActivity : AppCompatActivity() {
         cameraExecutor = Executors.newSingleThreadExecutor()
     }
 
-    private fun changeCameraMode(){
-        // cameraModeIndex iterates mode
-        cameraModeIndex = (cameraModeIndex + 1) % CameraMode.values().size
+    private fun swapCameraMode(){
+        when(cameraMode){
+            CameraMode.PHOTO -> cameraMode = CameraMode.VIDEO
+            CameraMode.VIDEO -> cameraMode = CameraMode.PHOTO
+        }
 
         startCamera()
     }
+
+    private fun swapCameraSelector(){
+        when(myCameraSelector){
+            MyCameraSelector.BACK -> myCameraSelector = MyCameraSelector.FRONT
+            MyCameraSelector.FRONT -> myCameraSelector = MyCameraSelector.BACK
+        }
+
+        startCamera()
+    }
+    private fun getCameraSelector(selectedCamera: MyCameraSelector): CameraSelector {
+        when(selectedCamera){
+            MyCameraSelector.BACK -> return CameraSelector.DEFAULT_BACK_CAMERA
+            MyCameraSelector.FRONT -> return CameraSelector.DEFAULT_FRONT_CAMERA
+        }
+    }
+
+
 
     private fun takePhoto() {
         // Get a stable reference of the modifiable image capture use case
@@ -205,8 +233,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun startCamera() {
 
-        // Sets text to the chip.
-        viewBinding.chip.text = "${CameraMode.values()[cameraModeIndex]} MODE"
+        // Sets text to the camera mode chip.
+        viewBinding.chip.text = "$cameraMode MODE"
+
+        // Sets text to the camera selection chip.
+        viewBinding.chip2.text = "$myCameraSelector"
 
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
 
@@ -221,13 +252,12 @@ class MainActivity : AppCompatActivity() {
                     it.setSurfaceProvider(viewBinding.viewFinder.surfaceProvider)
                 }
 
-            // Select back camera as a default
-            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+            val cameraSelector = getCameraSelector(myCameraSelector)
 
             try {
                 // Unbind use cases before rebinding
                 cameraProvider.unbindAll()
-                when(CameraMode.values()[cameraModeIndex]) {
+                when(cameraMode) {
                     CameraMode.PHOTO -> {
 
                         // Sets the listener for the button.
@@ -275,7 +305,6 @@ class MainActivity : AppCompatActivity() {
         }, ContextCompat.getMainExecutor(this))
 
     }
-
 
     private fun requestPermissions() {
         activityResultLauncher.launch(REQUIRED_PERMISSIONS)
