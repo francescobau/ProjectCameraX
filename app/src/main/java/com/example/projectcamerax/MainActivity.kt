@@ -6,6 +6,7 @@ import android.content.ContentValues
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.provider.MediaStore
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.ImageCapture
@@ -21,6 +22,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.core.Preview
 import androidx.camera.core.CameraSelector
 import android.util.Log
+import androidx.camera.core.Camera
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.ImageProxy
@@ -95,19 +97,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun swapCameraMode(){
-        when(cameraMode){
-            CameraMode.PHOTO -> cameraMode = CameraMode.VIDEO
-            CameraMode.VIDEO -> cameraMode = CameraMode.PHOTO
-        }
+        // Swaps between PHOTO and VIDEO, iterating the enum values.
+        cameraMode = CameraMode.values()[ (cameraMode.ordinal+1) % CameraMode.values().size ]
 
         startCamera()
     }
 
     private fun swapCameraSelector(){
-        when(myCameraSelector){
-            MyCameraSelector.BACK -> myCameraSelector = MyCameraSelector.FRONT
-            MyCameraSelector.FRONT -> myCameraSelector = MyCameraSelector.BACK
-        }
+        // Swaps between BACK and FRONT, iterating the enum values.
+        myCameraSelector = MyCameraSelector.values()[( myCameraSelector.ordinal+1) % MyCameraSelector.values().size ]
 
         startCamera()
     }
@@ -271,11 +269,11 @@ class MainActivity : AppCompatActivity() {
                         // Start ImageAnalyzer instance.
                         val imageAnalyzer = ImageAnalysis.Builder()
                             .build()
-                            .also {
-                                it.setAnalyzer(cameraExecutor, LuminosityAnalyzer { luma ->
-                                    Log.d(TAG, "Average luminosity: $luma")
-                                })
-                            }
+//                            .also {
+//                                it.setAnalyzer(cameraExecutor, LuminosityAnalyzer { luma ->
+//                                    Log.d(TAG, "Average luminosity: $luma")
+//                                })
+//                            }
                         // Bind use cases to camera
                         cameraProvider.bindToLifecycle(
                             this, cameraSelector, preview, imageCapture, imageAnalyzer)
@@ -313,6 +311,26 @@ class MainActivity : AppCompatActivity() {
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(
             baseContext, it) == PackageManager.PERMISSION_GRANTED
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        // Saves Camera Mode enum
+        outState.putInt(CameraMode::class.simpleName,cameraMode.ordinal)
+        Log.d(TAG,"Saved key: ${CameraMode::class.simpleName} \t value: ${cameraMode.ordinal}")
+        // Saves Camera Selector enum
+        outState.putInt(MyCameraSelector::class.simpleName,myCameraSelector.ordinal)
+        Log.d(TAG,"Saved key: ${MyCameraSelector::class.simpleName} \t value: ${myCameraSelector.ordinal}")
+
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        // Restores Camera Mode
+        cameraMode = CameraMode.values()[ savedInstanceState.getInt(CameraMode::class.simpleName) ]
+        // Restores Camera Selector
+        myCameraSelector = MyCameraSelector.values() [ savedInstanceState.getInt(MyCameraSelector::class.simpleName) ]
+
+        super.onRestoreInstanceState(savedInstanceState)
     }
 
     override fun onDestroy() {
