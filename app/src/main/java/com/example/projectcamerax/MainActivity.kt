@@ -2,8 +2,11 @@ package com.example.projectcamerax
 
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.ContentValues
+import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
+import android.hardware.SensorManager
 import android.os.Build
 import android.os.Bundle
 import android.os.PersistableBundle
@@ -22,6 +25,9 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.core.Preview
 import androidx.camera.core.CameraSelector
 import android.util.Log
+import android.view.Display
+import android.view.Surface
+import android.widget.Button
 import androidx.camera.core.Camera
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCaptureException
@@ -30,6 +36,8 @@ import androidx.camera.video.MediaStoreOutputOptions
 import androidx.camera.video.Quality
 import androidx.camera.video.QualitySelector
 import androidx.camera.video.VideoRecordEvent
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.PermissionChecker
 import com.example.projectcamerax.databinding.ActivityMainBinding
 import java.nio.ByteBuffer
@@ -79,6 +87,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
+
+//        Log.d(TAG,"CURRENT ORIENTATION: $requestedOrientation || ${requestedOrientation::class.simpleName}")
+//        if(requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT)
+//            adjustReverseLayout()
         setContentView(viewBinding.root)
 
         // Request camera permissions
@@ -95,6 +107,18 @@ class MainActivity : AppCompatActivity() {
         }
         cameraExecutor = Executors.newSingleThreadExecutor()
     }
+
+    //TODO: Function needs to be completed.
+    //TODO: Find a way to detect reverse landscape.
+//    private fun adjustReverseLayout() {
+//        val mySet = ConstraintSet()
+//        mySet.clone(viewBinding.root)
+//        mySet.connect(viewBinding.captureButton.id,ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.LEFT)
+//        mySet.setHorizontalBias(viewBinding.captureButton.id,0.0F)
+//        mySet.setMargin(viewBinding.captureButton.id,ConstraintSet.LEFT,16)
+//        mySet.connect(viewBinding.captureButton.id,ConstraintSet.RIGHT, ConstraintSet.PARENT_ID, ConstraintSet.RIGHT)
+//        Log.d(TAG,"ADJUSTED REVERSE LANDSCAPE ROTATION.")
+//    }
 
     private fun swapCameraMode(){
         // Swaps between PHOTO and VIDEO, iterating the enum values.
