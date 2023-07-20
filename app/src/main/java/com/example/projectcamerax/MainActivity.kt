@@ -32,6 +32,8 @@ import androidx.camera.core.Camera
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.ImageProxy
+import androidx.camera.core.ResolutionInfo
+import androidx.camera.core.SurfaceRequest
 import androidx.camera.video.MediaStoreOutputOptions
 import androidx.camera.video.Quality
 import androidx.camera.video.QualitySelector
@@ -267,11 +269,15 @@ class MainActivity : AppCompatActivity() {
             // Used to bind the lifecycle of cameras to the lifecycle owner
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
 
+
             // Preview
             val preview = Preview.Builder()
                 .build()
                 .also {
                     it.setSurfaceProvider(viewBinding.viewFinder.surfaceProvider)
+//                    val surfaceProvider = viewBinding.viewFinder.surfaceProvider as SurfaceRequest
+//                    surfaceProvider.resolution
+                    //TODO
                 }
 
             val cameraSelector = getCameraSelector(myCameraSelector)
