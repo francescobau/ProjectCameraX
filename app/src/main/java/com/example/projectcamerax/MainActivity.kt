@@ -4,6 +4,7 @@ package com.example.projectcamerax
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.ContentValues
+import android.content.Context
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.hardware.SensorManager
@@ -401,6 +402,15 @@ class MainActivity : AppCompatActivity() {
             listener(luma)
 
             image.close()
+        }
+    }
+
+    private inner class Datasource() {
+        fun getFlowerList(): Array<String> {
+
+            // Return flower list from string resources
+            return arrayOf("")
+            //TODO: Extract array list of media items
         }
     }
 }
