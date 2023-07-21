@@ -2,49 +2,37 @@ package com.example.projectcamerax
 
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.ContentValues
-import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
-import android.hardware.SensorManager
 import android.os.Build
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.provider.MediaStore
-import androidx.appcompat.app.AppCompatActivity
-import androidx.camera.core.ImageCapture
-import androidx.camera.video.Recorder
-import androidx.camera.video.Recording
-import androidx.camera.video.VideoCapture
-import androidx.core.content.ContextCompat
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.core.Preview
+import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
-import android.util.Log
-import android.view.Display
-import android.view.Surface
-import android.widget.Button
-import androidx.camera.core.Camera
 import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.ImageProxy
-import androidx.camera.core.ResolutionInfo
-import androidx.camera.core.SurfaceRequest
+import androidx.camera.core.Preview
+import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.video.MediaStoreOutputOptions
 import androidx.camera.video.Quality
 import androidx.camera.video.QualitySelector
+import androidx.camera.video.Recorder
+import androidx.camera.video.Recording
+import androidx.camera.video.VideoCapture
 import androidx.camera.video.VideoRecordEvent
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.content.ContextCompat
 import androidx.core.content.PermissionChecker
 import com.example.projectcamerax.databinding.ActivityMainBinding
 import java.nio.ByteBuffer
 import java.text.SimpleDateFormat
 import java.util.Locale
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 typealias LumaListener = (luma: Double) -> Unit
 
@@ -69,7 +57,8 @@ class MainActivity : AppCompatActivity() {
 
     private val activityResultLauncher =
         registerForActivityResult(
-            ActivityResultContracts.RequestMultiplePermissions())
+            ActivityResultContracts.RequestMultiplePermissions()
+        )
         { permissions ->
             // Handle Permission granted/rejected
             var permissionGranted = true
@@ -78,9 +67,11 @@ class MainActivity : AppCompatActivity() {
                     permissionGranted = false
             }
             if (!permissionGranted) {
-                Toast.makeText(baseContext,
+                Toast.makeText(
+                    baseContext,
                     "Permission request denied",
-                    Toast.LENGTH_SHORT).show()
+                    Toast.LENGTH_SHORT
+                ).show()
             } else {
                 startCamera()
             }
@@ -90,9 +81,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
 
-//        Log.d(TAG,"CURRENT ORIENTATION: $requestedOrientation || ${requestedOrientation::class.simpleName}")
-//        if(requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT)
-//            adjustReverseLayout()
         setContentView(viewBinding.root)
 
         // Request camera permissions
@@ -101,47 +89,38 @@ class MainActivity : AppCompatActivity() {
             viewBinding.chip.setOnClickListener { swapCameraMode() }
 
             // Sets the listener for the back/front camera chip
-            viewBinding.chip2.setOnClickListener{ swapCameraSelector() }
+            viewBinding.chip2.setOnClickListener { swapCameraSelector() }
 
             startCamera()
         } else {
             requestPermissions()
         }
         cameraExecutor = Executors.newSingleThreadExecutor()
+
     }
 
-    //TODO: Function needs to be completed.
-    //TODO: Find a way to detect reverse landscape.
-//    private fun adjustReverseLayout() {
-//        val mySet = ConstraintSet()
-//        mySet.clone(viewBinding.root)
-//        mySet.connect(viewBinding.captureButton.id,ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.LEFT)
-//        mySet.setHorizontalBias(viewBinding.captureButton.id,0.0F)
-//        mySet.setMargin(viewBinding.captureButton.id,ConstraintSet.LEFT,16)
-//        mySet.connect(viewBinding.captureButton.id,ConstraintSet.RIGHT, ConstraintSet.PARENT_ID, ConstraintSet.RIGHT)
-//        Log.d(TAG,"ADJUSTED REVERSE LANDSCAPE ROTATION.")
-//    }
 
-    private fun swapCameraMode(){
+    private fun swapCameraMode() {
         // Swaps between PHOTO and VIDEO, iterating the enum values.
-        cameraMode = CameraMode.values()[ (cameraMode.ordinal+1) % CameraMode.values().size ]
+        cameraMode = CameraMode.values()[(cameraMode.ordinal + 1) % CameraMode.values().size]
 
         startCamera()
     }
 
-    private fun swapCameraSelector(){
+    private fun swapCameraSelector() {
         // Swaps between BACK and FRONT, iterating the enum values.
-        myCameraSelector = MyCameraSelector.values()[( myCameraSelector.ordinal+1) % MyCameraSelector.values().size ]
+        myCameraSelector =
+            MyCameraSelector.values()[(myCameraSelector.ordinal + 1) % MyCameraSelector.values().size]
 
         startCamera()
     }
+
     private fun getCameraSelector(selectedCamera: MyCameraSelector): CameraSelector {
-        when(selectedCamera){
+        when (selectedCamera) {
             MyCameraSelector.BACK -> return CameraSelector.DEFAULT_BACK_CAMERA
             MyCameraSelector.FRONT -> return CameraSelector.DEFAULT_FRONT_CAMERA
         }
     }
-
 
 
     private fun takePhoto() {
@@ -154,16 +133,18 @@ class MainActivity : AppCompatActivity() {
         val contentValues = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, name)
             put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-            if(Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
                 put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/CameraX-Image")
             }
         }
 
         // Create output options object which contains file + metadata
         val outputOptions = ImageCapture.OutputFileOptions
-            .Builder(contentResolver,
+            .Builder(
+                contentResolver,
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                contentValues)
+                contentValues
+            )
             .build()
 
         // Set up image capture listener, which is triggered after photo has
@@ -177,7 +158,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 override fun
-                        onImageSaved(output: ImageCapture.OutputFileResults){
+                        onImageSaved(output: ImageCapture.OutputFileResults) {
                     val msg = "Photo capture succeeded: ${output.savedUri}"
                     Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
                     Log.d(TAG, msg)
@@ -218,21 +199,24 @@ class MainActivity : AppCompatActivity() {
         recording = videoCapture.output
             .prepareRecording(this, mediaStoreOutputOptions)
             .apply {
-                if (PermissionChecker.checkSelfPermission(this@MainActivity,
-                        Manifest.permission.RECORD_AUDIO) ==
-                    PermissionChecker.PERMISSION_GRANTED)
-                {
+                if (PermissionChecker.checkSelfPermission(
+                        this@MainActivity,
+                        Manifest.permission.RECORD_AUDIO
+                    ) ==
+                    PermissionChecker.PERMISSION_GRANTED
+                ) {
                     withAudioEnabled()
                 }
             }
             .start(ContextCompat.getMainExecutor(this)) { recordEvent ->
-                when(recordEvent) {
+                when (recordEvent) {
                     is VideoRecordEvent.Start -> {
                         viewBinding.captureButton.apply {
                             text = getString(R.string.stop_capture)
                             isEnabled = true
                         }
                     }
+
                     is VideoRecordEvent.Finalize -> {
                         if (!recordEvent.hasError()) {
                             val msg = "Video capture succeeded: " +
@@ -243,8 +227,10 @@ class MainActivity : AppCompatActivity() {
                         } else {
                             recording?.close()
                             recording = null
-                            Log.e(TAG, "Video capture ends with error: " +
-                                    "${recordEvent.error}")
+                            Log.e(
+                                TAG, "Video capture ends with error: " +
+                                        "${recordEvent.error}"
+                            )
                         }
                         viewBinding.captureButton.apply {
                             text = getString(R.string.start_capture)
@@ -275,9 +261,6 @@ class MainActivity : AppCompatActivity() {
                 .build()
                 .also {
                     it.setSurfaceProvider(viewBinding.viewFinder.surfaceProvider)
-//                    val surfaceProvider = viewBinding.viewFinder.surfaceProvider as SurfaceRequest
-//                    surfaceProvider.resolution
-                    //TODO
                 }
 
             val cameraSelector = getCameraSelector(myCameraSelector)
@@ -285,7 +268,7 @@ class MainActivity : AppCompatActivity() {
             try {
                 // Unbind use cases before rebinding
                 cameraProvider.unbindAll()
-                when(cameraMode) {
+                when (cameraMode) {
                     CameraMode.PHOTO -> {
 
                         // Sets the listener for the button.
@@ -306,8 +289,10 @@ class MainActivity : AppCompatActivity() {
 //                            }
                         // Bind use cases to camera
                         cameraProvider.bindToLifecycle(
-                            this, cameraSelector, preview, imageCapture, imageAnalyzer)
+                            this, cameraSelector, preview, imageCapture, imageAnalyzer
+                        )
                     }
+
                     CameraMode.VIDEO -> {
 
                         // Sets the listener for the button.
@@ -326,7 +311,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
 
-            } catch(exc: Exception) {
+            } catch (exc: Exception) {
                 Log.e(TAG, "Use case binding failed", exc)
             }
 
@@ -340,31 +325,37 @@ class MainActivity : AppCompatActivity() {
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(
-            baseContext, it) == PackageManager.PERMISSION_GRANTED
+            baseContext, it
+        ) == PackageManager.PERMISSION_GRANTED
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         // Saves Camera Mode enum
-        outState.putInt(CameraMode::class.simpleName,cameraMode.ordinal)
-        Log.d(TAG,"Saved key: ${CameraMode::class.simpleName} \t value: ${cameraMode.ordinal}")
+        outState.putInt(CameraMode::class.simpleName, cameraMode.ordinal)
+        Log.d(TAG, "Saved key: ${CameraMode::class.simpleName} \t value: ${cameraMode.ordinal}")
         // Saves Camera Selector enum
-        outState.putInt(MyCameraSelector::class.simpleName,myCameraSelector.ordinal)
-        Log.d(TAG,"Saved key: ${MyCameraSelector::class.simpleName} \t value: ${myCameraSelector.ordinal}")
+        outState.putInt(MyCameraSelector::class.simpleName, myCameraSelector.ordinal)
+        Log.d(
+            TAG,
+            "Saved key: ${MyCameraSelector::class.simpleName} \t value: ${myCameraSelector.ordinal}"
+        )
 
         super.onSaveInstanceState(outState)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         // Restores Camera Mode
-        cameraMode = CameraMode.values()[ savedInstanceState.getInt(CameraMode::class.simpleName) ]
+        cameraMode = CameraMode.values()[savedInstanceState.getInt(CameraMode::class.simpleName)]
         // Restores Camera Selector
-        myCameraSelector = MyCameraSelector.values() [ savedInstanceState.getInt(MyCameraSelector::class.simpleName) ]
+        myCameraSelector =
+            MyCameraSelector.values()[savedInstanceState.getInt(MyCameraSelector::class.simpleName)]
 
         super.onRestoreInstanceState(savedInstanceState)
     }
 
     override fun onDestroy() {
         super.onDestroy()
+
         cameraExecutor.shutdown()
     }
 
@@ -372,7 +363,7 @@ class MainActivity : AppCompatActivity() {
         private const val TAG = "Project CameraX"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
         private val REQUIRED_PERMISSIONS =
-            mutableListOf (
+            mutableListOf(
                 Manifest.permission.CAMERA,
                 Manifest.permission.RECORD_AUDIO
             ).apply {
@@ -382,7 +373,8 @@ class MainActivity : AppCompatActivity() {
             }.toTypedArray()
     }
 
-    private inner class LuminosityAnalyzer(private val listener: LumaListener) : ImageAnalysis.Analyzer {
+    private inner class LuminosityAnalyzer(private val listener: LumaListener) :
+        ImageAnalysis.Analyzer {
 
         private fun ByteBuffer.toByteArray(): ByteArray {
             rewind()    // Rewind the buffer to zero
