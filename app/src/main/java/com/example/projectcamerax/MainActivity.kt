@@ -2,15 +2,12 @@ package com.example.projectcamerax
 
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
-import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
-import android.hardware.SensorManager
 import android.os.Build
 import android.os.Bundle
-import android.os.PersistableBundle
+import android.os.Environment
 import android.provider.MediaStore
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.ImageCapture
@@ -26,23 +23,16 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.core.Preview
 import androidx.camera.core.CameraSelector
 import android.util.Log
-import android.view.Display
-import android.view.Surface
-import android.widget.Button
-import androidx.camera.core.Camera
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.ImageProxy
-import androidx.camera.core.ResolutionInfo
-import androidx.camera.core.SurfaceRequest
 import androidx.camera.video.MediaStoreOutputOptions
 import androidx.camera.video.Quality
 import androidx.camera.video.QualitySelector
 import androidx.camera.video.VideoRecordEvent
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.PermissionChecker
 import com.example.projectcamerax.databinding.ActivityMainBinding
+import java.io.File
 import java.nio.ByteBuffer
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -104,6 +94,18 @@ class MainActivity : AppCompatActivity() {
             // Sets the listener for the back/front camera chip
             viewBinding.chip2.setOnClickListener{ swapCameraSelector() }
 
+            val datasource = Datasource()
+            // Sets the listener for the click on the image icon.
+            viewBinding.imageButton?.setOnClickListener{
+                val mediaList = datasource.getMediaList()
+                Log.d(TAG,"SIZE: ${mediaList.size}")
+                var index = 0
+                for (string in mediaList) {
+                    Log.d(TAG, "[$index] $string")
+                    index = index.inc()
+                }
+            }
+
             startCamera()
         } else {
             requestPermissions()
@@ -156,7 +158,7 @@ class MainActivity : AppCompatActivity() {
             put(MediaStore.MediaColumns.DISPLAY_NAME, name)
             put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
             if(Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/CameraX-Image")
+                put(MediaStore.Images.Media.RELATIVE_PATH, RELATIVE_PATH_PHOTO)
             }
         }
 
@@ -208,7 +210,7 @@ class MainActivity : AppCompatActivity() {
             put(MediaStore.MediaColumns.DISPLAY_NAME, name)
             put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4")
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-                put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/CameraX-Video")
+                put(MediaStore.Video.Media.RELATIVE_PATH, RELATIVE_PATH_VIDEO)
             }
         }
 
@@ -371,6 +373,8 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val TAG = "Project CameraX"
+        private const val RELATIVE_PATH_PHOTO = "Pictures/CameraX-Image"
+        private const val RELATIVE_PATH_VIDEO = "Movies/CameraX-Video"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
         private val REQUIRED_PERMISSIONS =
             mutableListOf (
@@ -406,11 +410,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private inner class Datasource() {
-        fun getFlowerList(): Array<String> {
+        fun getMediaList(): Array<String> {
 
-            // Return flower list from string resources
-            return arrayOf("")
-            //TODO: Extract array list of media items
+            //TODO Retrieve file list from paths.
+            return fileList()
         }
     }
 }
