@@ -1,6 +1,7 @@
 package com.example.projectcamerax
 
 import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -9,8 +10,30 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import java.text.DecimalFormat
 
-class MediaPickerAdapter {
+class MediaPickerAdapter(private val mediaList: Array<String>) : RecyclerView.Adapter<MediaPickerAdapter.MediaViewHolder>() {
     // TODO: Adapter for the MediaPicker RecyclerView.
+    private val onClickListener = View.OnClickListener { v->
+        val mediaName = v.findViewById<TextView>(R.id.media_title).text
+
+        val intent = Intent(Intent.ACTION_CAMERA_BUTTON, v.findViewById<TextView>(R.id.media_path).text as Uri)
+        //TODO: Improve Datasource in order to get MIME type and absolute path.
+
+    }
+    class MediaViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
+
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MediaViewHolder {
+        TODO("Not yet implemented")
+    }
+
+    override fun getItemCount(): Int {
+        TODO("Not yet implemented")
+    }
+
+    override fun onBindViewHolder(holder: MediaViewHolder, position: Int) {
+        TODO("Not yet implemented")
+    }
 }
 
 class FlowerAdapter(private val flowerList: Array<String>) :

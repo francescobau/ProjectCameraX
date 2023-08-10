@@ -411,9 +411,29 @@ class MainActivity : AppCompatActivity() {
 
     private inner class Datasource() {
         fun getMediaList(): Array<String> {
+            val mediaList = mutableListOf<String>()
 
-            //TODO Retrieve file list from paths.
-            return fileList()
+            val picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+            val cameraXImageDir = File(picturesDir, RELATIVE_PATH_PHOTO)
+
+            val moviesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES)
+            val cameraXVideoDir = File(moviesDir, RELATIVE_PATH_VIDEO)
+
+            val mediaDirectories = arrayOf(cameraXImageDir, cameraXVideoDir)
+
+            for (mediaDir in mediaDirectories) {
+                if (mediaDir.exists()) {
+                    val files = mediaDir.listFiles()
+                    files?.forEach { file ->
+                        if (file.isFile) {
+                            mediaList.add(file.name)
+                        }
+                    }
+                }
+            }
+
+            return mediaList.toTypedArray()
         }
     }
+
 }
