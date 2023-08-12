@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.FileProvider
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import java.io.File
@@ -68,9 +69,14 @@ class MediaPickerAdapter(private val mediaList: MutableList<MediaInfo>) :
                 val mediaFile = File(mediaPathText)
 
                 if (mediaFile.exists()) {
-                    val mediaUri = Uri.fromFile(mediaFile)
+                    val mediaUri = FileProvider.getUriForFile(
+                        v.context,
+                        "${v.context.packageName}.fileprovider",
+                        mediaFile
+                    )
                     val intent = Intent(Intent.ACTION_VIEW)
                     intent.setDataAndType(mediaUri, mediaInfo.mimeType)
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
                     if (intent.resolveActivity(v.context.packageManager) != null) {
                         v.context.startActivity(intent)
@@ -81,12 +87,6 @@ class MediaPickerAdapter(private val mediaList: MutableList<MediaInfo>) :
                             Toast.LENGTH_SHORT
                         ).show()
                     }
-                } else {
-                    Toast.makeText(
-                        v.context,
-                        "File does not exist",
-                        Toast.LENGTH_SHORT
-                    ).show()
                 }
 
             }
