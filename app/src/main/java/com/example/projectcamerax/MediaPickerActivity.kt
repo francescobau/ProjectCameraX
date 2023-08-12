@@ -2,31 +2,35 @@ package com.example.projectcamerax
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.widget.TextView
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 
 class MediaPickerActivity : AppCompatActivity() {
+
+    private lateinit var mediaAdapter: MediaPickerAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_media_picker)
+
+        val recyclerView: RecyclerView = findViewById(R.id.recycler_view)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+
+        val mediaList = fetchMediaList()
+
+        mediaAdapter = MediaPickerAdapter(mediaList)
+        recyclerView.adapter = mediaAdapter
     }
-}
 
-class DetailActivity : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_detail)
-
-        val dt: TextView = findViewById(R.id.detail_text)
-        //val str = "is a nice flower"
-        // Estraggo il parametro passato con l'intent tramite putExtra(...)
-        //dt.text = "${intent.extras?.getString(FlowerAdapter.FLOWER_TAG)} $str"
-        dt.text = "${intent.extras?.getString(FlowerAdapter.FLOWER_TAG)} ${getString(R.string.flower_str)}"
-        //dt.text = dt.text.("FFF".toRegex(),intent.extras?.getString(FlowerAdapter.FLOWER_TAG) as CharSequence)
-        // Stampa di debug del parametro
-        Log.d(
-            DetailActivity::class.simpleName,
-            "Intent's extra = ${intent.extras?.getString(FlowerAdapter.FLOWER_TAG)}"
-        )
+    private fun fetchMediaList(): MutableList<MediaInfo> {
+        val datasource = Datasource().getMediaList()
+        if (datasource.isEmpty()) {
+            val noMedia = TextView(this)
+            noMedia.text = "NO_MEDIA"
+            noMedia.textSize = 50.0F
+            setContentView(noMedia)
+            return emptyList<MediaInfo>().toMutableList()
+        } else return datasource
     }
 }

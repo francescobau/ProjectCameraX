@@ -3,7 +3,7 @@ package com.example.projectcamerax
 
 import android.Manifest
 import android.content.ContentValues
-import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -23,6 +23,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.core.Preview
 import androidx.camera.core.CameraSelector
 import android.util.Log
+import android.webkit.MimeTypeMap
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.ImageProxy
@@ -41,6 +42,8 @@ typealias LumaListener = (luma: Double) -> Unit
 
 enum class CameraMode { PHOTO, VIDEO }
 enum class MyCameraSelector { BACK, FRONT }
+
+data class MediaInfo(val title: String, val mimeType: String, val fullPath: String)
 
 class MainActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityMainBinding
@@ -99,11 +102,13 @@ class MainActivity : AppCompatActivity() {
             viewBinding.imageButton?.setOnClickListener{
                 val mediaList = datasource.getMediaList()
                 Log.d(TAG,"SIZE: ${mediaList.size}")
+                val intent = Intent(this,MediaPickerActivity::class.java)
                 var index = 0
-                for (string in mediaList) {
-                    Log.d(TAG, "[$index] $string")
+                for (media in mediaList) {
+                    Log.d(TAG, "[$index] $media")
                     index = index.inc()
                 }
+                startActivity(intent)
             }
 
             startCamera()
@@ -113,17 +118,6 @@ class MainActivity : AppCompatActivity() {
         cameraExecutor = Executors.newSingleThreadExecutor()
     }
 
-    //TODO: Function needs to be completed.
-    //TODO: Find a way to detect reverse landscape.
-//    private fun adjustReverseLayout() {
-//        val mySet = ConstraintSet()
-//        mySet.clone(viewBinding.root)
-//        mySet.connect(viewBinding.captureButton.id,ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.LEFT)
-//        mySet.setHorizontalBias(viewBinding.captureButton.id,0.0F)
-//        mySet.setMargin(viewBinding.captureButton.id,ConstraintSet.LEFT,16)
-//        mySet.connect(viewBinding.captureButton.id,ConstraintSet.RIGHT, ConstraintSet.PARENT_ID, ConstraintSet.RIGHT)
-//        Log.d(TAG,"ADJUSTED REVERSE LANDSCAPE ROTATION.")
-//    }
 
     private fun swapCameraMode(){
         // Swaps between PHOTO and VIDEO, iterating the enum values.
@@ -158,7 +152,7 @@ class MainActivity : AppCompatActivity() {
             put(MediaStore.MediaColumns.DISPLAY_NAME, name)
             put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
             if(Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-                put(MediaStore.Images.Media.RELATIVE_PATH, RELATIVE_PATH_PHOTO)
+                put(MediaStore.Images.Media.RELATIVE_PATH, "${Environment.DIRECTORY_PICTURES}/$LOCAL_PHOTO_DIRECTORY")
             }
         }
 
@@ -210,7 +204,7 @@ class MainActivity : AppCompatActivity() {
             put(MediaStore.MediaColumns.DISPLAY_NAME, name)
             put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4")
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-                put(MediaStore.Video.Media.RELATIVE_PATH, RELATIVE_PATH_VIDEO)
+                put(MediaStore.Video.Media.RELATIVE_PATH, "${Environment.DIRECTORY_MOVIES}/$LOCAL_VIDEO_DIRECTORY")
             }
         }
 
@@ -373,8 +367,8 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val TAG = "Project CameraX"
-        private const val RELATIVE_PATH_PHOTO = "Pictures/CameraX-Image"
-        private const val RELATIVE_PATH_VIDEO = "Movies/CameraX-Video"
+        const val LOCAL_PHOTO_DIRECTORY = "CameraX-Image"
+        const val LOCAL_VIDEO_DIRECTORY = "CameraX-Video"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
         private val REQUIRED_PERMISSIONS =
             mutableListOf (
@@ -408,32 +402,41 @@ class MainActivity : AppCompatActivity() {
             image.close()
         }
     }
+}
 
-    private inner class Datasource() {
-        fun getMediaList(): Array<String> {
-            val mediaList = mutableListOf<String>()
+class Datasource() {
 
-            val picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-            val cameraXImageDir = File(picturesDir, RELATIVE_PATH_PHOTO)
+    fun getMediaList(): MutableList<MediaInfo> {
+        val mediaList = mutableListOf<MediaInfo>()
 
-            val moviesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES)
-            val cameraXVideoDir = File(moviesDir, RELATIVE_PATH_VIDEO)
+        val picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+        val cameraXImageDir = File(picturesDir, MainActivity.LOCAL_PHOTO_DIRECTORY)
 
-            val mediaDirectories = arrayOf(cameraXImageDir, cameraXVideoDir)
+        val moviesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES)
+        val cameraXVideoDir = File(moviesDir, MainActivity.LOCAL_VIDEO_DIRECTORY)
 
-            for (mediaDir in mediaDirectories) {
-                if (mediaDir.exists()) {
-                    val files = mediaDir.listFiles()
-                    files?.forEach { file ->
-                        if (file.isFile) {
-                            mediaList.add(file.name)
-                        }
+        val mediaDirectories = arrayOf(cameraXImageDir, cameraXVideoDir)
+
+        for (mediaDir in mediaDirectories) {
+            if (mediaDir.exists()) {
+                val files = mediaDir.listFiles()
+                files?.forEach { file ->
+                    if (file.isFile) {
+                        val mediaInfo = MediaInfo(file.name, getMimeType(file), file.absolutePath)
+                        mediaList.add(mediaInfo)
+
                     }
                 }
             }
-
-            return mediaList.toTypedArray()
         }
+
+        return mediaList
+    }
+
+    private fun getMimeType(file: File): String {
+        val extension = MimeTypeMap.getFileExtensionFromUrl(file.path)
+        Log.d(Datasource::class.simpleName, "File Extension: $extension")
+        return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension) ?: "unknown"
     }
 
 }
