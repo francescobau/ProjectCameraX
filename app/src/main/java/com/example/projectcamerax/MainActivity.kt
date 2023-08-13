@@ -2,14 +2,12 @@ package com.example.projectcamerax
 
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.ContentValues
-import android.content.pm.ActivityInfo
+import android.content.Intent
 import android.content.pm.PackageManager
-import android.hardware.SensorManager
 import android.os.Build
 import android.os.Bundle
-import android.os.PersistableBundle
+import android.os.Environment
 import android.provider.MediaStore
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.ImageCapture
@@ -25,23 +23,17 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.core.Preview
 import androidx.camera.core.CameraSelector
 import android.util.Log
-import android.view.Display
-import android.view.Surface
-import android.widget.Button
-import androidx.camera.core.Camera
+import android.webkit.MimeTypeMap
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.ImageProxy
-import androidx.camera.core.ResolutionInfo
-import androidx.camera.core.SurfaceRequest
 import androidx.camera.video.MediaStoreOutputOptions
 import androidx.camera.video.Quality
 import androidx.camera.video.QualitySelector
 import androidx.camera.video.VideoRecordEvent
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.PermissionChecker
 import com.example.projectcamerax.databinding.ActivityMainBinding
+import java.io.File
 import java.nio.ByteBuffer
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -50,6 +42,8 @@ typealias LumaListener = (luma: Double) -> Unit
 
 enum class CameraMode { PHOTO, VIDEO }
 enum class MyCameraSelector { BACK, FRONT }
+
+data class MediaInfo(val title: String, val mimeType: String, val fullPath: String)
 
 class MainActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityMainBinding
@@ -103,6 +97,20 @@ class MainActivity : AppCompatActivity() {
             // Sets the listener for the back/front camera chip
             viewBinding.chip2.setOnClickListener{ swapCameraSelector() }
 
+            val datasource = Datasource()
+            // Sets the listener for the click on the image icon.
+            viewBinding.imageButton?.setOnClickListener{
+                val mediaList = datasource.getMediaList()
+                Log.d(TAG,"SIZE: ${mediaList.size}")
+                val intent = Intent(this,MediaPickerActivity::class.java)
+                var index = 0
+                for (media in mediaList) {
+                    Log.d(TAG, "[$index] $media")
+                    index = index.inc()
+                }
+                startActivity(intent)
+            }
+
             startCamera()
         } else {
             requestPermissions()
@@ -110,17 +118,6 @@ class MainActivity : AppCompatActivity() {
         cameraExecutor = Executors.newSingleThreadExecutor()
     }
 
-    //TODO: Function needs to be completed.
-    //TODO: Find a way to detect reverse landscape.
-//    private fun adjustReverseLayout() {
-//        val mySet = ConstraintSet()
-//        mySet.clone(viewBinding.root)
-//        mySet.connect(viewBinding.captureButton.id,ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.LEFT)
-//        mySet.setHorizontalBias(viewBinding.captureButton.id,0.0F)
-//        mySet.setMargin(viewBinding.captureButton.id,ConstraintSet.LEFT,16)
-//        mySet.connect(viewBinding.captureButton.id,ConstraintSet.RIGHT, ConstraintSet.PARENT_ID, ConstraintSet.RIGHT)
-//        Log.d(TAG,"ADJUSTED REVERSE LANDSCAPE ROTATION.")
-//    }
 
     private fun swapCameraMode(){
         // Swaps between PHOTO and VIDEO, iterating the enum values.
@@ -155,7 +152,7 @@ class MainActivity : AppCompatActivity() {
             put(MediaStore.MediaColumns.DISPLAY_NAME, name)
             put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
             if(Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/CameraX-Image")
+                put(MediaStore.Images.Media.RELATIVE_PATH, "${Environment.DIRECTORY_PICTURES}/$LOCAL_PHOTO_DIRECTORY")
             }
         }
 
@@ -207,7 +204,7 @@ class MainActivity : AppCompatActivity() {
             put(MediaStore.MediaColumns.DISPLAY_NAME, name)
             put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4")
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-                put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/CameraX-Video")
+                put(MediaStore.Video.Media.RELATIVE_PATH, "${Environment.DIRECTORY_MOVIES}/$LOCAL_VIDEO_DIRECTORY")
             }
         }
 
@@ -370,6 +367,8 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val TAG = "Project CameraX"
+        const val LOCAL_PHOTO_DIRECTORY = "CameraX-Image"
+        const val LOCAL_VIDEO_DIRECTORY = "CameraX-Video"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
         private val REQUIRED_PERMISSIONS =
             mutableListOf (
@@ -403,4 +402,41 @@ class MainActivity : AppCompatActivity() {
             image.close()
         }
     }
+}
+
+class Datasource() {
+
+    fun getMediaList(): MutableList<MediaInfo> {
+        val mediaList = mutableListOf<MediaInfo>()
+
+        val picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+        val cameraXImageDir = File(picturesDir, MainActivity.LOCAL_PHOTO_DIRECTORY)
+
+        val moviesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES)
+        val cameraXVideoDir = File(moviesDir, MainActivity.LOCAL_VIDEO_DIRECTORY)
+
+        val mediaDirectories = arrayOf(cameraXImageDir, cameraXVideoDir)
+
+        for (mediaDir in mediaDirectories) {
+            if (mediaDir.exists()) {
+                val files = mediaDir.listFiles()
+                files?.forEach { file ->
+                    if (file.isFile) {
+                        val mediaInfo = MediaInfo(file.name, getMimeType(file), file.absolutePath)
+                        mediaList.add(mediaInfo)
+
+                    }
+                }
+            }
+        }
+
+        return mediaList
+    }
+
+    private fun getMimeType(file: File): String {
+        val extension = MimeTypeMap.getFileExtensionFromUrl(file.path)
+        Log.d(Datasource::class.simpleName, "File Extension: $extension")
+        return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension) ?: "unknown"
+    }
+
 }
