@@ -296,11 +296,11 @@ class MainActivity : AppCompatActivity() {
                         // Start ImageAnalyzer instance.
                         val imageAnalyzer = ImageAnalysis.Builder()
                             .build()
-//                            .also {
-//                                it.setAnalyzer(cameraExecutor, LuminosityAnalyzer { luma ->
-//                                    Log.d(TAG, "Average luminosity: $luma")
-//                                })
-//                            }
+                            .also {
+                                it.setAnalyzer(cameraExecutor, LuminosityAnalyzer { luma ->
+                                    Log.d(TAG, "Average luminosity: $luma")
+                                })
+                            }
                         // Bind use cases to camera
                         cameraProvider.bindToLifecycle(
                             this, cameraSelector, preview, imageCapture, imageAnalyzer)
