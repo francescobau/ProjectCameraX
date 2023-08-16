@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.camera.camera2.*
 
 class MediaPickerActivity : AppCompatActivity() {
 
