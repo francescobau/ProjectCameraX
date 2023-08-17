@@ -68,7 +68,7 @@ class MainActivity : AppCompatActivity() {
             // Handle Permission granted/rejected
             var permissionGranted = true
             permissions.entries.forEach {
-                if (it.key in REQUIRED_PERMISSIONS && it.value == false)
+                if (it.key in REQUIRED_PERMISSIONS && !it.value)
                     permissionGranted = false
             }
             if (!permissionGranted) {
@@ -99,7 +99,7 @@ class MainActivity : AppCompatActivity() {
 
             val datasource = Datasource()
             // Sets the listener for the click on the image icon.
-            viewBinding.imageButton?.setOnClickListener{
+            viewBinding.imageButton.setOnClickListener{
                 val mediaList = datasource.getMediaList()
                 Log.d(TAG,"SIZE: ${mediaList.size}")
                 val intent = Intent(this,MediaPickerActivity::class.java)
@@ -133,9 +133,9 @@ class MainActivity : AppCompatActivity() {
         startCamera()
     }
     private fun getCameraSelector(selectedCamera: MyCameraSelector): CameraSelector {
-        when(selectedCamera){
-            MyCameraSelector.BACK -> return CameraSelector.DEFAULT_BACK_CAMERA
-            MyCameraSelector.FRONT -> return CameraSelector.DEFAULT_FRONT_CAMERA
+        return when(selectedCamera){
+            MyCameraSelector.BACK -> CameraSelector.DEFAULT_BACK_CAMERA
+            MyCameraSelector.FRONT -> CameraSelector.DEFAULT_FRONT_CAMERA
         }
     }
 
@@ -381,7 +381,7 @@ class MainActivity : AppCompatActivity() {
             }.toTypedArray()
     }
 
-    private inner class LuminosityAnalyzer(private val listener: LumaListener) : ImageAnalysis.Analyzer {
+    private inner class LuminosityAnalyzer(private val ignoredListener: LumaListener) : ImageAnalysis.Analyzer {
 
         private fun ByteBuffer.toByteArray(): ByteArray {
             rewind()    // Rewind the buffer to zero
@@ -397,14 +397,14 @@ class MainActivity : AppCompatActivity() {
             val pixels = data.map { it.toInt() and 0xFF }
             val luma = pixels.average()
 
-            listener(luma)
+            ignoredListener(luma)
 
             image.close()
         }
     }
 }
 
-class Datasource() {
+class Datasource {
 
     fun getMediaList(): MutableList<MediaInfo> {
         val mediaList = mutableListOf<MediaInfo>()
