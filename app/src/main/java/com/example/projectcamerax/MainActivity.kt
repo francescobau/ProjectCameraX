@@ -38,13 +38,33 @@ import java.nio.ByteBuffer
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+/**
+ * Alias for a function type that takes a [Double] parameter representing luma.
+ */
 typealias LumaListener = (luma: Double) -> Unit
 
+/**
+ * Enum class representing the camera modes: PHOTO and VIDEO.
+ */
 enum class CameraMode { PHOTO, VIDEO }
+
+/**
+ * Enum class representing the camera selectors: BACK and FRONT.
+ */
 enum class MyCameraSelector { BACK, FRONT }
 
+/**
+ * Data class representing information about a media item.
+ *
+ * @property title The title of the media item.
+ * @property mimeType The MIME type of the media item.
+ * @property fullPath The full path of the media item.
+ */
 data class MediaInfo(val title: String, val mimeType: String, val fullPath: String)
 
+/**
+ * This is the main activity of the CameraX project.
+ */
 class MainActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityMainBinding
 
@@ -118,7 +138,9 @@ class MainActivity : AppCompatActivity() {
         cameraExecutor = Executors.newSingleThreadExecutor()
     }
 
-
+    /**
+     * Swaps between PHOTO and VIDEO camera modes.
+     */
     private fun swapCameraMode(){
         // Swaps between PHOTO and VIDEO, iterating the enum values.
         cameraMode = CameraMode.values()[ (cameraMode.ordinal+1) % CameraMode.values().size ]
@@ -126,12 +148,22 @@ class MainActivity : AppCompatActivity() {
         startCamera()
     }
 
+    /**
+     * Swaps between BACK and FRONT camera selectors.
+     */
     private fun swapCameraSelector(){
         // Swaps between BACK and FRONT, iterating the enum values.
         myCameraSelector = MyCameraSelector.values()[( myCameraSelector.ordinal+1) % MyCameraSelector.values().size ]
 
         startCamera()
     }
+
+    /**
+     * Returns the [CameraSelector] based on the selected [MyCameraSelector].
+     *
+     * @param selectedCamera The selected camera mode.
+     * @return The [CameraSelector] instance.
+     */
     private fun getCameraSelector(selectedCamera: MyCameraSelector): CameraSelector {
         return when(selectedCamera){
             MyCameraSelector.BACK -> CameraSelector.DEFAULT_BACK_CAMERA
@@ -140,7 +172,9 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-
+    /**
+     * Takes a photo using the [ImageCapture] use case.
+     */
     private fun takePhoto() {
         // Get a stable reference of the modifiable image capture use case
         val imageCapture = imageCapture ?: return
@@ -183,7 +217,9 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    // Implements VideoCapture use case, including start and stop capturing.
+    /**
+     * Captures a video using the [VideoCapture] use case.
+     */
     private fun captureVideo() {
         val videoCapture = this.videoCapture ?: return
 
@@ -252,6 +288,9 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
+    /**
+     * Initializes and configures the camera based on the selected mode and camera selector.
+     */
     private fun startCamera() {
 
         // Sets text to the camera mode chip.
@@ -337,15 +376,27 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    /**
+     * Requests necessary permissions from the user.
+     */
     private fun requestPermissions() {
         activityResultLauncher.launch(REQUIRED_PERMISSIONS)
     }
 
+    /**
+     * Checks if all required permissions are granted.
+     *
+     * @return `true` if all permissions are granted, `false` otherwise.
+     */
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(
             baseContext, it) == PackageManager.PERMISSION_GRANTED
     }
 
+    /**
+     * Saves the instance state of the activity.
+     * @param outState The [Bundle] used to save the state before the activity changes status in lifecycle.
+     */
     override fun onSaveInstanceState(outState: Bundle) {
         // Saves Camera Mode enum
         outState.putInt(CameraMode::class.simpleName,cameraMode.ordinal)
@@ -357,6 +408,10 @@ class MainActivity : AppCompatActivity() {
         super.onSaveInstanceState(outState)
     }
 
+    /**
+     * Restores the instance state of the activity.
+     * @param savedInstanceState The [Bundle] containing the saved instance, ready to be restored.
+     */
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         // Restores Camera Mode
         cameraMode = CameraMode.values()[ savedInstanceState.getInt(CameraMode::class.simpleName) ]
@@ -366,6 +421,9 @@ class MainActivity : AppCompatActivity() {
         super.onRestoreInstanceState(savedInstanceState)
     }
 
+    /**
+     * Releases resources when the activity is destroyed.
+     */
     override fun onDestroy() {
         super.onDestroy()
         cameraExecutor.shutdown()
@@ -410,6 +468,9 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
+/**
+ * Data source class to fetch media information from storage.
+ */
 class Datasource {
 
     fun getMediaList(): MutableList<MediaInfo> {

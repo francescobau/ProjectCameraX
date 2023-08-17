@@ -6,6 +6,9 @@ import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
+/**
+ * This activity allows users to pick and view media files.
+ */
 class MediaPickerActivity : AppCompatActivity() {
 
     private lateinit var mediaAdapter: MediaPickerAdapter
@@ -23,6 +26,11 @@ class MediaPickerActivity : AppCompatActivity() {
         recyclerView.adapter = mediaAdapter
     }
 
+    /**
+     * Fetches the list of media files to display.
+     *
+     * @return The list of [MediaInfo] objects representing media files.
+     */
     private fun fetchMediaList(): MutableList<MediaInfo> {
         val datasource = Datasource().getMediaList()
         return if (datasource.isEmpty()) {

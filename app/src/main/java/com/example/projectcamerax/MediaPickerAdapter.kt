@@ -12,24 +12,47 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import java.io.File
 
+/**
+ * Adapter for displaying media items in a RecyclerView.
+ *
+ * @property mediaList The list of media items to display.
+ */
 class MediaPickerAdapter(private val mediaList: MutableList<MediaInfo>) :
     RecyclerView.Adapter<MediaPickerAdapter.MediaViewHolder>() {
 
+    /**
+     * Creates a new [MediaViewHolder] instance.
+     * @param parent The ViewGroup into which the new View will be added after it is bound to an adapter position.
+     * @param viewType The view type of the new View.
+     */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MediaViewHolder {
         val itemView = LayoutInflater.from(parent.context)
             .inflate(R.layout.media_item, parent, false)
         return MediaViewHolder(itemView)
     }
 
+    /**
+     * Returns the number of media items in the list.
+     * @return The total number of items in this adapter.
+     */
     override fun getItemCount(): Int {
         return mediaList.size
     }
 
+    /**
+     * Binds the data to the [MediaViewHolder].
+     * @param holder The ViewHolder which should be updated to represent the contents of the item at the given position in the data set.
+     * @param position The position of the item within the adapter's data set.
+     */
     override fun onBindViewHolder(holder: MediaViewHolder, position: Int) {
         val mediaInfo = mediaList[position]
         holder.bind(mediaInfo)
     }
 
+    /**
+     * ViewHolder class for media items.
+     * @param itemView The view that will be linked to the ViewHolder.
+     */
     inner class MediaViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         private val mediaTitle: TextView = itemView.findViewById(R.id.media_title)
@@ -54,6 +77,9 @@ class MediaPickerAdapter(private val mediaList: MutableList<MediaInfo>) :
             }
         }
 
+        /**
+         * Binds media item data to the view.
+         */
         fun bind(mediaInfo: MediaInfo) {
             mediaTitle.text = mediaInfo.title
             mediaType.text = mediaInfo.mimeType
