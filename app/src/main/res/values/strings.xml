@@ -3,4 +3,15 @@
     <string name="take_photo">Take Photo</string>
     <string name="start_capture">Start Capture</string>
     <string name="stop_capture">Stop Capture</string>
+    <string name="gallery_description">Gallery icon</string>
+    <string name="camera_selector_default">BACK / FRONT</string>
+    <string name="camera_selector_BACK">BACK</string>
+    <string name="camera_selector_FRONT">FRONT</string>
+    <string name="camera_mode_PHOTO">PHOTO MODE</string>
+    <string name="camera_mode_VIDEO">VIDEO MODE</string>
+    <string name="media_title_default">[Media_title]</string>
+    <string name="media_type_default">[Media_type]</string>
+    <string name="media_path_default">[Media_path]</string>
+    <string name="delete_button_text">X</string>
+    <string name="no_media_text">NO_MEDIA</string>
 </resources>

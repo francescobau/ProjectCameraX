@@ -30,7 +30,7 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:checkable="true"
-        android:text="BACK / FRONT"
+        android:text="@string/camera_selector_default"
         android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@+id/capture_button"
         app:layout_constraintEnd_toEndOf="parent"
@@ -45,7 +45,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:text="Photo/Video"
+        android:text="@string/camera_mode_PHOTO"
         android:visibility="visible"
         app:layout_constraintBaseline_toBaselineOf="@+id/capture_button"
         app:layout_constraintEnd_toStartOf="@+id/capture_button"
@@ -71,14 +71,15 @@
 
     <ImageButton
         android:id="@+id/imageButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="110dp"
+        android:layout_height="110dp"
+        android:contentDescription="@string/gallery_description"
         app:layout_constraintBottom_toBottomOf="@+id/viewFinder"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/capture_button"
-        app:srcCompat="@drawable/ic_launcher_foreground" />
+        app:srcCompat="@android:drawable/ic_menu_gallery" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/vertical_centerline"

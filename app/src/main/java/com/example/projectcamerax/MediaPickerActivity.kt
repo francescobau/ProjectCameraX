@@ -27,7 +27,7 @@ class MediaPickerActivity : AppCompatActivity() {
         val datasource = Datasource().getMediaList()
         return if (datasource.isEmpty()) {
             val noMedia = TextView(this)
-            noMedia.text = "NO_MEDIA"
+            noMedia.text = getString(R.string.no_media_text)
             noMedia.textSize = 50.0F
             setContentView(noMedia)
             emptyList<MediaInfo>().toMutableList()

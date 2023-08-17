@@ -255,10 +255,16 @@ class MainActivity : AppCompatActivity() {
     private fun startCamera() {
 
         // Sets text to the camera mode chip.
-        viewBinding.chip.text = "$cameraMode MODE"
+        viewBinding.chip.text = when(cameraMode) {
+            CameraMode.PHOTO -> getString(R.string.camera_mode_PHOTO)
+            CameraMode.VIDEO -> getString(R.string.camera_mode_VIDEO)
+        }
 
         // Sets text to the camera selection chip.
-        viewBinding.chip2.text = "$myCameraSelector"
+        viewBinding.chip2.text = when (myCameraSelector) {
+            MyCameraSelector.BACK  -> getString(R.string.camera_selector_BACK)
+            MyCameraSelector.FRONT -> getString(R.string.camera_selector_FRONT)
+        }
 
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
 

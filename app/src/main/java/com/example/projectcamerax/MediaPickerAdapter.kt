@@ -42,8 +42,9 @@ class MediaPickerAdapter(private val mediaList: MutableList<MediaInfo>) :
             if (fileToDelete.exists()) {
                 val deleted = fileToDelete.delete()
                 if (deleted) {
-                    mediaList.remove(mediaInfo)
-                    notifyDataSetChanged()
+                    val index = mediaList.indexOf(mediaInfo)
+                    mediaList.removeAt(index)
+                    notifyItemRemoved(index)
                     deleteButton.visibility = View.GONE
                     Toast.makeText(itemView.context, "File deleted", Toast.LENGTH_SHORT).show()
                 } else {
