@@ -12,6 +12,6 @@
     <string name="media_title_default">[Media_title]</string>
     <string name="media_type_default">[Media_type]</string>
     <string name="media_path_default">[Media_path]</string>
-    <string name="delete_button_text">X</string>
-    <string name="no_media_text">NO_MEDIA</string>
+    <string name="delete_button_text" translatable="false">X</string>
+    <string name="no_media_text" translatable="false">NO_MEDIA</string>
 </resources>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Project CameraX</string>
+    <string name="start_capture">Inizia registrazione</string>
+    <string name="stop_capture">Ferma registrazione</string>
+    <string name="gallery_description">Icona galleria</string>
+    <string name="camera_selector_default">RETRO / FRONTE</string>
+    <string name="camera_selector_BACK">RETRO</string>
+    <string name="camera_selector_FRONT">FRONTE</string>
+    <string name="camera_mode_PHOTO">MOD. FOTO</string>
+    <string name="camera_mode_VIDEO">MOD. VIDEO</string>
+    <string name="media_title_default">[Titolo_media]</string>
+    <string name="media_type_default">[Tipologia_media]</string>
+    <string name="media_path_default">[Percorso_media]</string>
+    <string name="take_photo">Cattura foto</string>
+</resources>
