@@ -13,6 +13,10 @@ class MediaPickerActivity : AppCompatActivity() {
 
     private lateinit var mediaAdapter: MediaPickerAdapter
 
+    /**
+     * Code executed when Activity is created.
+     * @param savedInstanceState If a saved instance exists, this is the [Bundle] containing it, eventually restored by function [onRestoreInstanceState].
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_media_picker)

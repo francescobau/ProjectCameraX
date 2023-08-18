@@ -51,7 +51,7 @@ class MediaPickerAdapter(private val mediaList: MutableList<MediaInfo>) :
 
     /**
      * ViewHolder class for media items.
-     * @param itemView The view that will be linked to the ViewHolder.
+     * @property itemView The view that will be linked to the ViewHolder.
      */
     inner class MediaViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -60,6 +60,10 @@ class MediaPickerAdapter(private val mediaList: MutableList<MediaInfo>) :
         private val mediaPath: TextView = itemView.findViewById(R.id.media_path)
         private val deleteButton: Button = itemView.findViewById(R.id.delete_button)
 
+        /**
+         * Function that deletes media from drive and from ViewHolder.
+         * @param mediaInfo The [MediaInfo] instance that needs to be removed.
+         */
         private fun deleteMedia(mediaInfo: MediaInfo) {
             val fileToDelete = File(mediaInfo.fullPath)
             if (fileToDelete.exists()) {
@@ -78,6 +82,7 @@ class MediaPickerAdapter(private val mediaList: MutableList<MediaInfo>) :
 
         /**
          * Binds media item data to the view.
+         * @param mediaInfo The [MediaInfo] instance that will be binded to the view.
          */
         fun bind(mediaInfo: MediaInfo) {
             mediaTitle.text = mediaInfo.title

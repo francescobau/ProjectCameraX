@@ -100,13 +100,14 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+    /**
+     * Code executed when Activity is created.
+     * @param savedInstanceState If a saved instance exists, this is the [Bundle] containing it, eventually restored by function [onRestoreInstanceState].
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
 
-//        Log.d(TAG,"CURRENT ORIENTATION: $requestedOrientation || ${requestedOrientation::class.simpleName}")
-//        if(requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT)
-//            adjustReverseLayout()
         setContentView(viewBinding.root)
 
         // Request camera permissions
