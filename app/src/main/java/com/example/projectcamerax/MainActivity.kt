@@ -102,7 +102,8 @@ class MainActivity : AppCompatActivity() {
 
     /**
      * Code executed when Activity is created.
-     * @param savedInstanceState If a saved instance exists, this is the [Bundle] containing it, eventually restored by function [onRestoreInstanceState].
+     * @param savedInstanceState If a saved instance exists, this is the [Bundle] containing it,
+     * eventually restored by function [onRestoreInstanceState].
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -318,9 +319,6 @@ class MainActivity : AppCompatActivity() {
                 .build()
                 .also {
                     it.setSurfaceProvider(viewBinding.viewFinder.surfaceProvider)
-//                    val surfaceProvider = viewBinding.viewFinder.surfaceProvider as SurfaceRequest
-//                    surfaceProvider.resolution
-                    //TODO
                 }
 
             val cameraSelector = getCameraSelector(myCameraSelector)
