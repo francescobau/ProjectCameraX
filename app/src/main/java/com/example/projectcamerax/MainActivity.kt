@@ -75,7 +75,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var cameraExecutor: ExecutorService
 
-    // Selecto photo mode as default
+    // Select photo mode as default
     private var cameraMode = CameraMode.PHOTO
 
     // Select back camera as a default

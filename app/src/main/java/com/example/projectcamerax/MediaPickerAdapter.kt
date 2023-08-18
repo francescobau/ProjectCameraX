@@ -65,9 +65,8 @@ class MediaPickerAdapter(private val mediaList: MutableList<MediaInfo>) :
             if (fileToDelete.exists()) {
                 val deleted = fileToDelete.delete()
                 if (deleted) {
-                    val index = mediaList.indexOf(mediaInfo)
-                    mediaList.removeAt(index)
-                    notifyItemRemoved(index)
+                    mediaList.remove(mediaInfo)
+                    notifyItemRemoved(adapterPosition)
                     deleteButton.visibility = View.GONE
                     Toast.makeText(itemView.context, "File deleted", Toast.LENGTH_SHORT).show()
                 } else {
@@ -119,7 +118,7 @@ class MediaPickerAdapter(private val mediaList: MutableList<MediaInfo>) :
 
             deleteButton.setOnClickListener { deleteMedia(mediaInfo) }
             itemView.setOnLongClickListener { v ->
-                // Inverte lo stato della visibilità del pulsante di cancellazione
+                // Swaps the visibility status of the delete button.
                 if (deleteButton.isVisible) deleteButton.visibility = View.GONE
                 else deleteButton.visibility = View.VISIBLE
                 notifyItemChanged(adapterPosition)

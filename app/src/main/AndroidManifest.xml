@@ -35,7 +35,7 @@
             android:exported="true"
             android:screenOrientation="sensor">
 
-            <!-- Intent filter per aprire immagini -->
+            <!-- Intent filter to open pictures -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -44,7 +44,7 @@
                 <data android:scheme="file" />
             </intent-filter>
 
-            <!-- Intent filter per aprire video -->
+            <!-- Intent filter to open video -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
