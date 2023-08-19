@@ -11,13 +11,17 @@
         android:id="@+id/viewFinder"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:visibility="visible">
 
     </androidx.camera.view.PreviewView>
+
+    <com.google.android.material.chip.Chip
+        android:id="@+id/chip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Photo/Video"
+        android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@+id/capture_button" />
 
     <com.google.android.material.chip.Chip
         android:id="@+id/chip2"
@@ -32,22 +36,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/capture_button" />
 
-    <com.google.android.material.chip.Chip
-        android:id="@+id/chip"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:text="Photo/Video"
-        android:visibility="visible"
-        app:layout_constraintBottom_toTopOf="@+id/capture_button"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
-
     <Button
         android:id="@+id/capture_button"
         android:layout_width="110dp"
@@ -57,6 +45,7 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:elevation="2dp"
+        android:onClick="MainActivity::takePhoto()"
         android:text="@string/take_photo"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"

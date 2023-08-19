@@ -38,6 +38,10 @@ import java.nio.ByteBuffer
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.Scanner
+import android.R
+import android.view.View
+import android.widget.Button
+import android.widget.TextView
 
 typealias LumaListener = (luma: Double) -> Unit
 
@@ -259,7 +263,8 @@ class MainActivity : AppCompatActivity() {
         viewBinding.chip.text = "$cameraMode MODE"
 
         // Sets text to the camera selection chip.
-        viewBinding.chip2.text = "$myCameraSelector"
+//        viewBinding.chip2.text = "$myCameraSelector"
+        viewBinding.chip2.setText("$myCameraSelector")
 
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
 
@@ -287,7 +292,8 @@ class MainActivity : AppCompatActivity() {
                     CameraMode.PHOTO -> {
 
                         // Sets the listener for the button.
-                        viewBinding.captureButton.setOnClickListener { takePhoto() }
+                        //viewBinding.captureButton.setOnClickListener { takePhoto() }
+
 
                         // Edit name of the button.
                         viewBinding.captureButton.text = getText(R.string.take_photo)
@@ -349,7 +355,7 @@ class MainActivity : AppCompatActivity() {
         outState.putInt(MyCameraSelector::class.simpleName,myCameraSelector.ordinal)
         Log.d(TAG,"Saved key: ${MyCameraSelector::class.simpleName} \t value: ${myCameraSelector.ordinal}")
 
-        super.onSaveInstanceState(outState)
+//        super.onSaveInstanceState(outState)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
