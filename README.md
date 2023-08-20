@@ -10,7 +10,8 @@ Ci sono 3 branch da visualizzare:
 - **develop_lint_OK**, in cui è presente la app "corretta", in cui sono stati risolti i problemi rilevati da Android Lint, aggiunti i JavaDocs e la traduzione in italiano.
 - **develop**, in cui si può vedere lo stato della app prima di essere "corretta" nel branch "develop_lint_OK".
 
-Per generare un report in Lint tramite linea di comando, si può usare il Terminale in Android Studio e digitare il comando: **.\gradlew lint**
+Per generare un report in Lint tramite linea di comando, si può usare il Terminale in Android Studio e digitare il comando: **.\gradlew lint**.
+Non è possibile effettuarlo nel branch **develop_lint_KO**, perché presenta errori che impediscono la build della app, quindi è raccomandato usare lo strumento in Android Studio: Code -> Inspect Code.
 
 ----------
 ## Descrizione del progetto
