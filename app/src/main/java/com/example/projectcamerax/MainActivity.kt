@@ -2,6 +2,7 @@ package com.example.projectcamerax
 
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -105,6 +106,7 @@ class MainActivity : AppCompatActivity() {
      * @param savedInstanceState If a saved instance exists, this is the [Bundle] containing it,
      * eventually restored by function [onRestoreInstanceState].
      */
+    @SuppressLint("LogConditional")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
@@ -293,6 +295,7 @@ class MainActivity : AppCompatActivity() {
     /**
      * Initializes and configures the camera based on the selected mode and camera selector.
      */
+    @SuppressLint("LogConditional")
     private fun startCamera() {
 
         // Sets text to the camera mode chip.
@@ -396,6 +399,7 @@ class MainActivity : AppCompatActivity() {
      * Saves the instance state of the activity.
      * @param outState The [Bundle] used to save the state before the activity changes status in lifecycle.
      */
+    @SuppressLint("LogConditional")
     override fun onSaveInstanceState(outState: Bundle) {
         // Saves Camera Mode enum
         outState.putInt(CameraMode::class.simpleName,cameraMode.ordinal)
@@ -499,6 +503,7 @@ class Datasource {
         return mediaList
     }
 
+    @SuppressLint("LogConditional")
     private fun getMimeType(file: File): String {
         val extension = MimeTypeMap.getFileExtensionFromUrl(file.path)
         Log.d(Datasource::class.simpleName, "File Extension: $extension")

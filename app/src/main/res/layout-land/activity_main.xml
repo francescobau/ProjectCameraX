@@ -86,6 +86,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent=".50" />
+        app:layout_constraintGuide_percent=".50"
+        tools:ignore="UnusedIds" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
