@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <!-- Conversion to WebP ignored because the Android Studio IDE's tool to convert the icon won't convert them. -->
+    <issue id="ConvertToWebp" severity="ignore"/>
+    <!-- This app was developed using Android Studio Electric Eel and Android Studio Flamingo,
+    and AGP version is 7.4.2, minimum requirement for Sdk 33.
+    For Sdk 34 and above, the minimum AGP version should be 8.1.1, and the recommended Android Studio version should be
+    Android Studio Hedgehog. For more information, consult this section:
+    https://developer.android.com/build/releases/gradle-plugin#api-level-support
+    Since this app was developed for academic purpose only, this lint check will be ignored. -->
+    <issue id="OldTargetApi" severity="ignore"/>
+    <!-- For the same reason, warnings that tell to update Gradle dependencies will be ignored,
+    although in general it's recommended to keep up to date. -->
+    <issue id="GradleDependency" severity="ignore"/>
+
+    <!-- Hardcoded Text issue is considered important, especially for translating issues. -->
+    <issue id="HardcodedText" severity="error"/>
+</lint>
