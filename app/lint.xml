@@ -12,6 +12,9 @@
     <!-- For the same reason, warnings that tell to update Gradle dependencies will be ignored,
     although in general it's recommended to keep up to date. -->
     <issue id="GradleDependency" severity="ignore"/>
+    <!-- In this app, unconditional Logs are put on purpose, so this lint check should be ignored for the entire project. -->
+    <issue id="LogConditional" severity="ignore"/>
+
 
     <!-- Hardcoded Text issue is considered important, especially for translating issues. -->
     <issue id="HardcodedText" severity="error"/>

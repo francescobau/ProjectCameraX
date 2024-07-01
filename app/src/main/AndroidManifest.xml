@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Reminder: this app is NOT optimized for Chrome OS. -->
     <uses-feature android:name="android.hardware.camera.any"
         tools:ignore="UnsupportedChromeOsHardware" />
     <uses-permission android:name="android.permission.CAMERA"
