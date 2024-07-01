@@ -342,8 +342,8 @@ class MainActivity : AppCompatActivity() {
                             .build()
                             .also {
                                 it.setAnalyzer(cameraExecutor, LuminosityAnalyzer { luma ->
-                                    // Uncomment if you want to see Luminosity details in log.
-                                    // Log.d(TAG, "Average luminosity: $luma")
+                                    // Luminosity details visible in log.
+                                    Log.d(TAG, "Average luminosity: $luma")
                                 })
                             }
                         // Bind use cases to camera
